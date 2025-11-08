@@ -1,11 +1,11 @@
 {
-  "name": "starter",
+  "name": "natours",
   "version": "1.0.0",
-  "description": "node.js project",
-  "main": "index.js",
+  "description": "Learning-MongoDB-Express",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Kolokolnikov E.A.",
   "license": "ISC"
 }
