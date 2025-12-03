@@ -6,9 +6,9 @@ const userRouter = require('./routes/userRouts');
 const app = express();
 
 // 1)Промежуточное ПО
-
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   console.log('Hellow from the middleware 📟');
