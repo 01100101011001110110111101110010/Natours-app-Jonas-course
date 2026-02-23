@@ -4,6 +4,7 @@ const APIFeatures = require('../utils/apiFeatures');
 exports.aliasTopTours = (req, res, next) => {
   Object.defineProperty(req, 'query', {
     value: {
+      // eslint-disable-next-line
       ...req.query,
       limit: '5',
       sort: '-ratingsAverage,price',
@@ -130,9 +131,9 @@ exports.getTourStats = async (req, res) => {
       {
         $sort: { avgPrice: 1 },
       },
-      {
-        $match: { _id: { $ne: 'EASY' } },
-      },
+      // {
+      //   $match: { _id: { $ne: 'EASY' } },
+      // },
     ]);
     res.status(200).json({
       status: 'success',

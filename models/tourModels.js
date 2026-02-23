@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const slugify = require('slugify');
+
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -8,6 +10,9 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+
+    slug: String,
+
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -53,6 +58,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -65,7 +74,32 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 
 // Промежуточное ПО запускается перед коммандами .save() и .create()
-tourSchema.pre('save', function () {});
+tourSchema.pre('save', function () {
+  this.slug = slugify(this.name, { lower: true });
+});
+// tourSchema.pre('save', function () {
+//   console.log('Сохраняем документ...');
+// });
+// tourSchema.post('save', function (doc) {
+//   console.log(doc);
+// });
+
+// Промежуточное ПО для запросов
+tourSchema.pre(/^find/, function () {
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+});
+
+tourSchema.post(/^find/, function (docs) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+});
+
+// Промежуточное ПО для агрегации
+tourSchema.pre('aggregate', function () {
+  console.log(
+    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }),
+  );
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
