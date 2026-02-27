@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js"
+    "start:prod": "NODE_ENV=production nodemon server.js",
+    "debug": "ndb server.js"
   },
   "author": "Kolokolnikov E.A.",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "express": "^5.1.0",
     "mongoose": "^9.0.1",
     "morgan": "^1.10.1",
+    "ndb": "^1.1.5",
     "slugify": "^1.6.6",
     "validator": "^13.15.26"
   },
@@ -27,6 +29,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.7.4",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "validator": "^13.15.26"
   }
 }
