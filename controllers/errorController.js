@@ -55,8 +55,7 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
-    // console.log('ошибка блока строки 50', error);
-    console.log('error.errors.name', error.errors.name);
+
     if (error.name === 'CastError:') error = handleCastErrorDB(error); //здесь добавил двоиточие к CastError
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error.name === 'ValidatorError:');
