@@ -44,6 +44,7 @@ const sendErrorProd = (err, res) => {
     // Программная или другая неизвестная ошибка: не раскрывать детали пользователю
   } else {
     // 1) Зафиксировать ошибку
+    // eslint-disable-next-line
     console.error('Error 🤬', err);
     // 2) Отправить общее сообщение
     res.status(500).json({
@@ -60,6 +61,7 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
+    // eslint-disable-next-line
     let error = { ...err };
 
     if (error.name === 'CastError:') error = handleCastErrorDB(error); //здесь добавил двоиточие к CastError

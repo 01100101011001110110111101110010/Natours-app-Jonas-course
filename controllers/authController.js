@@ -4,6 +4,7 @@ const User = require('../models/userModels');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+// eslint-disable-next-line
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -17,6 +18,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   });
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -91,3 +93,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = freshUser;
   next();
 });
+
+// eslint-disable-next-line
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles = ['admin', 'lead-guide']. role = 'user'
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this acrion', 403),
+      );
+    }
+    next();
+  };
+};
