@@ -18,6 +18,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
+    passwordResetExpires: req.body.passwordResetExpires,
+    passwordResetToken: req.body.passwordResetToken,
     role: req.body.role,
   });
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
@@ -106,3 +108,17 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1)Определить пользователя на основании email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new AppError('There is no user with email adress.', 404));
+  }
+  // 2)Сгенерировать случайный токена для сброса пароля
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+  // 3)Отправить его на почту пользователя
+});
+
+exports.resetPassword = async (req, res, next) => {};
