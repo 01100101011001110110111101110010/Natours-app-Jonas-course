@@ -53,6 +53,12 @@ userSchema.pre('save', async function (next) {
   this.passwordConfirm = undefined;
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return;
+
+  this.passwordChangedAt = Date.now() - 1000;
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
