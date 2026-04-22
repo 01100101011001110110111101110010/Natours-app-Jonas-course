@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -11,16 +12,27 @@ const userRouter = require('./routes/userRouts');
 const app = express();
 
 // 1)Глобальное Промежуточное ПО
+// Установка защиты HTTP заголовков
+app.use(helmet());
+// Ведение журнала разработки
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message: 'To many requests from this IP, please try againe in an hour!',
 });
+// Лимит запросов от 1го IP
 app.use('/api', limiter);
-app.use(express.json());
+//Парсер тела(body) запроса, чтение данных из body в req.body
+app.use(
+  express.json({
+    limit: '10kb',
+  }),
+);
+// Обслуживание статических файлов
 app.use(express.static(`${__dirname}/public`));
 
+// Тестовое промежуточное ПО
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   console.log(req.headers);
