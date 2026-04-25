@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-
+const userModel = require('./userModels');
 const slugify = require('slugify');
-
 const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
@@ -84,6 +83,31 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: Array,
   },
   {
     toJSON: { virtuals: true },
@@ -98,6 +122,13 @@ tourSchema.virtual('durationWeeks').get(function () {
 // Промежуточное ПО запускается перед коммандами .save() и .create()
 tourSchema.pre('save', function () {
   this.slug = slugify(this.name, { lower: true });
+});
+
+tourSchema.pre('save', async function (next) {
+  const guidesPromises = this.guides.map(
+    async (id) => await userModel.findById(id),
+  );
+  this.guides = await Promise.all(guidesPromises);
 });
 // tourSchema.pre('save', function () {
 //   console.log('Сохраняем документ...');

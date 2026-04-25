@@ -33,9 +33,9 @@ app.use(
   }),
 );
 // Очистка данных от вредрения вредоносных запросов
-app.use(mongoSanitize());
+// app.use(mongoSanitize());
 // Очистка данных от внедрения межсайтовых скриптов
-app.use(xss());
+// app.use(xss());
 // Защита от HTTP параметров поллютии (HTTP Parameter Pollution)
 app.use(
   hpp({
