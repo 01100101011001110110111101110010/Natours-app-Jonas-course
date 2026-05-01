@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const userModel = require('./userModels');
+// const userModel = require('./userModels');
 const slugify = require('slugify');
 const validator = require('validator');
 
@@ -107,7 +107,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -124,12 +129,12 @@ tourSchema.pre('save', function () {
   this.slug = slugify(this.name, { lower: true });
 });
 
-tourSchema.pre('save', async function (next) {
-  const guidesPromises = this.guides.map(
-    async (id) => await userModel.findById(id),
-  );
-  this.guides = await Promise.all(guidesPromises);
-});
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(
+//     async (id) => await userModel.findById(id),
+//   );
+//   this.guides = await Promise.all(guidesPromises);
+// });
 // tourSchema.pre('save', function () {
 //   console.log('Сохраняем документ...');
 // });
@@ -145,6 +150,13 @@ tourSchema.pre(/^find/, function () {
 
 tourSchema.post(/^find/, function (docs) {
   console.log(`Query took ${Date.now() - this.start} milliseconds`);
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
 });
 
 // Промежуточное ПО для агрегации
