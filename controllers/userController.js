@@ -64,12 +64,6 @@ exports.getUser = (req, res) => {
   });
 };
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This rout is not yet defined!',
-  });
-};
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -77,4 +71,6 @@ exports.createUser = (req, res) => {
   });
 };
 
+// Не использовать для обновления пароля
+exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);
