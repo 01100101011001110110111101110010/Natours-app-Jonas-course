@@ -43,3 +43,10 @@ reviewSchema.pre(/^find/, function (next) {
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
+
+// POST /tours/:tourId/reviews
+// GET /tours/:tourId/reviews
+// GET /reviews
+// GET /reviews/:id
+// PATCH /reviews/:id
+// DELETE /reviews/:id
