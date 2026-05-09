@@ -39,13 +39,26 @@ reviewSchema.pre(/^find/, function (next) {
   });
 });
 
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+  console.log(stats);
+};
+
+reviewSchema.pre('save', function (next) {
+  this.constructor.calcAverageRatings(this);
+});
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
-
-// POST /tours/:tourId/reviews
-// GET /tours/:tourId/reviews
-// GET /reviews
-// GET /reviews/:id
-// PATCH /reviews/:id
-// DELETE /reviews/:id
