@@ -159,11 +159,10 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // Промежуточное ПО для агрегации
-tourSchema.pre('aggregate', function (next) {
-  console.log(
-    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }),
-  );
-});
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
