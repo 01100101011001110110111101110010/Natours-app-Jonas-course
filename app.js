@@ -13,6 +13,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRouts');
 const userRouter = require('./routes/userRouts');
 const reviewRouter = require('./routes/reviewRouts');
+const viewRouter = require('./routes/viewRouts');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -71,13 +72,8 @@ app.use((req, res, next) => {
 // 2)Обработчик маршрутов
 
 // 3)Маршруты
-app.get('/', (req, res) => {
-  res.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'Jonas',
-  });
-});
 
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
