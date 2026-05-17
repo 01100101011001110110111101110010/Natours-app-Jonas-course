@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -14,10 +15,20 @@ const userRouter = require('./routes/userRouts');
 const reviewRouter = require('./routes/reviewRouts');
 
 const app = express();
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 // 1)Глобальное Промежуточное ПО
+
+// Обслуживание статических файлов
+app.use(express.static(path.join(__dirname, 'public')));
 // Установка защиты HTTP заголовков
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    strictTransportSecurity: false,
+  }),
+);
 // Ведение журнала разработки
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 const limiter = rateLimit({
@@ -50,8 +61,6 @@ app.use(
     ],
   }),
 );
-// Обслуживание статических файлов
-app.use(express.static(`${__dirname}/public`));
 
 // Тестовое промежуточное ПО
 app.use((req, res, next) => {
@@ -62,6 +71,12 @@ app.use((req, res, next) => {
 // 2)Обработчик маршрутов
 
 // 3)Маршруты
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Jonas',
+  });
+});
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
