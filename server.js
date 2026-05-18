@@ -1,5 +1,8 @@
+const dns = require('dns');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
