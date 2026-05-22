@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -45,11 +46,8 @@ app.use(
     limit: '10kb',
   }),
 );
-// Очистка данных от вредрения вредоносных запросов
-// app.use(mongoSanitize());
-// Очистка данных от внедрения межсайтовых скриптов
-// app.use(xss());
-// Защита от HTTP параметров поллютии (HTTP Parameter Pollution)
+app.use(cookieParser());
+
 app.use(
   hpp({
     whitelist: [
@@ -66,6 +64,7 @@ app.use(
 // Тестовое промежуточное ПО
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
   next();
 });
 

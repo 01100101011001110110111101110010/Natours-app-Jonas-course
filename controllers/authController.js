@@ -73,6 +73,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -87,8 +89,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3) Существуют ли ещё пользователи, которые пытаются получить доступ к маршруту
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError(
         'The user belonging to this token does no longer exist.',
@@ -97,13 +99,38 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   // 4) Сменил ли пользователь пароль после подтверждения токена
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again.', 401),
     );
   }
   // Предоставить доступ к защищённому маршруту
-  req.user = freshUser;
+  req.user = currentUser;
+  next();
+});
+
+//Только для рендеринга страниц
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // Подтверждение токена
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+
+    // 2) Существуют ли ещё пользователь
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+    // 3) Сменил ли пользователь пароль после подтверждения токена
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+    // Зарегистрированный пользователь
+    res.locals.user = currentUser;
+    return next();
+  }
   next();
 });
 
