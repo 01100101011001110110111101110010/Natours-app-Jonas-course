@@ -1,7 +1,6 @@
 /* eslint-disable */
 const axios = require('axios').default;
-const hideAlert = require('./alerts');
-const showAlert = require('./alerts');
+const { hideAlert, showAlert } = require('./alerts');
 const login = async (email, password) => {
   try {
     const res = await axios({
@@ -24,4 +23,16 @@ const login = async (email, password) => {
   }
 };
 
-module.exports = login;
+const logOut = async () => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: '/api/v1/users/logout',
+    });
+    if (res.data.status === 'success') location.reload(true);
+  } catch (err) {
+    showAlert('error', 'Error logging out! Try againe.');
+  }
+};
+
+module.exports = { login, logOut };

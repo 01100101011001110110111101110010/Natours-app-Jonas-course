@@ -11,5 +11,4 @@ const showAlert = (type, msg) => {
   window.setTimeout(hideAlert, 5000);
 };
 
-module.exports = hideAlert;
-module.exports = showAlert;
+module.exports = { hideAlert, showAlert };

@@ -62,16 +62,17 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const logout = (req, res) => {
-    res.cookie('jwt', 'loggedout', {
-      expires: new Date(Date.now + 10 * 1000),
-      httpOnly: true,
-    });
-    res.status(200).json({ status: 'success' });
-  };
   // 3)Если всё в порядке, отправить токен пользователю
   createSendToken(user, 200, res);
 });
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Получить токен и проверить есть ли он там
@@ -118,29 +119,34 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 //Только для рендеринга страниц
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  if (req.cookies.jwt) {
-    // Подтверждение токена
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET,
-    );
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    if (req.cookies.jwt) {
+      if (req.cookies.jwt === 'loggedout') return next();
+      // Подтверждение токена
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET,
+      );
 
-    // 2) Существуют ли ещё пользователь
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
+      // 2) Существуют ли ещё пользователь
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+      // 3) Сменил ли пользователь пароль после подтверждения токена
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+      // Зарегистрированный пользователь
+      res.locals.user = currentUser;
       return next();
     }
-    // 3) Сменил ли пользователь пароль после подтверждения токена
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-    // Зарегистрированный пользователь
-    res.locals.user = currentUser;
+  } catch (err) {
     return next();
   }
   next();
-});
+};
 
 // eslint-disable-next-line
 exports.restrictTo = (...roles) => {
