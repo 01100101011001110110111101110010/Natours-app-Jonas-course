@@ -61,6 +61,14 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
+
+  const logout = (req, res) => {
+    res.cookie('jwt', 'loggedout', {
+      expires: new Date(Date.now + 10 * 1000),
+      httpOnly: true,
+    });
+    res.status(200).json({ status: 'success' });
+  };
   // 3)Если всё в порядке, отправить токен пользователю
   createSendToken(user, 200, res);
 });
