@@ -4,10 +4,19 @@ const displayMap = (locations) => {
   mapboxgl.accessToken =
     'pk.eyJ1IjoidmVub20xMzY4NiIsImEiOiJjbXBjcDBrMGUwMGJyMnNzOGlnNjd5bXFvIn0.35twOuLNg7spS5wtjEO1kA';
 
+  const originalFocus = HTMLElement.prototype.focus;
+  HTMLElement.prototype.focus = function (options) {
+    return originalFocus.call(this, { ...options, preventScroll: true });
+  };
+
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/venom13686/cmpevybm8000001sghnw3cvok',
     scrollZoom: false,
+  });
+
+  map.on('load', () => {
+    HTMLElement.prototype.focus = originalFocus;
   });
   const bounds = new mapboxgl.LngLatBounds();
 

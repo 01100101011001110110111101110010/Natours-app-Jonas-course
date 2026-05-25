@@ -24,34 +24,58 @@ const handleJWTError = () =>
 const handleJWTExpiredError = () =>
   new AppError('Your token has expired, please log in againe!', 401);
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
-  });
-};
-
-const sendErrorProd = (err, res) => {
-  // Операционная ошибка, которой доверяем: отправляем сообщение пользователю
-  if (err.isOperational) {
+const sendErrorDev = (err, req, res) => {
+  // а) API
+  if (req.originalUrl.startsWith('/api')) {
     res.status(err.statusCode).json({
       status: err.status,
+      error: err,
       message: err.message,
-      // isOperational: err.isOperational,
+      stack: err.stack,
     });
-    // Программная или другая неизвестная ошибка: не раскрывать детали пользователю
   } else {
-    // 1) Зафиксировать ошибку
+    // Отображенный вебсайт
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message,
+    });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
+  // A) API
+  if (req.originalUrl.startsWith('/api')) {
+    // Операционная ошибка — отправляем сообщение клиенту
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    }
+    // Программная ошибка — не раскрываем детали
     // eslint-disable-next-line
     console.error('Error 🤬', err);
-    // 2) Отправить общее сообщение
-    res.status(500).json({
+    return res.status(500).json({
       status: 'Error',
       message: 'Something went wrong!',
     });
   }
+
+  // B) Отображаемый сайт
+  // Операционная ошибка — показываем сообщение пользователю
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message,
+    });
+  }
+  // Программная ошибка — показываем общее сообщение
+  // eslint-disable-next-line
+  console.error('Error 🤬', err);
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: 'Please try again later.',
+  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -59,10 +83,12 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     // eslint-disable-next-line
     let error = { ...err };
+    error.message = err.message;
+    error.name = err.name;
 
     if (error.name === 'CastError:') error = handleCastErrorDB(error); //здесь добавил двоиточие к CastError
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
@@ -71,6 +97,6 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
     if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 };
