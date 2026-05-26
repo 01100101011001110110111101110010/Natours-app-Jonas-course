@@ -14220,7 +14220,9 @@ const logOut = async () => {
       method: 'GET',
       url: '/api/v1/users/logout'
     });
-    if (res.data.status === 'success') location.reload(true);
+    if (res.data.status === 'success') window.setTimeout(() => {
+      location.assign('/');
+    }, 1500);
   } catch (err) {
     showAlert('error', 'Error logging out! Try againe.');
   }
@@ -14283,18 +14285,42 @@ const displayMap = locations => {
   });
 };
 module.exports = displayMap;
-},{}],"index.js":[function(require,module,exports) {
+},{}],"updateSettings.js":[function(require,module,exports) {
+const axios = require('axios').default;
+const _require = require('./alerts'),
+  showAlert = _require.showAlert;
+const updateSettings = async (data, type) => {
+  // type это либо пароль, либо данные
+  try {
+    const route = type === 'password' ? 'updateMyPassword' : 'updateMe';
+    const res = await axios({
+      method: 'PATCH',
+      url: "api/v1/users/".concat(route),
+      data
+    });
+    if (res.data.status === 'success') {
+      showAlert('success', "".concat(type.toUpperCase(), " updated successfully"));
+    }
+  } catch (err) {
+    showAlert('error', err.response.data.message);
+  }
+};
+module.exports = updateSettings;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"index.js":[function(require,module,exports) {
 /* eslint-disable */
 const babel = require('@babel/polyfill');
 const _require = require('./login'),
   login = _require.login,
   logOut = _require.logOut;
 const displayMap = require('./mapbox');
+const updateSettings = require('./updateSettings');
 
 //DOM элементы
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
+const userDataForm = document.querySelector('.form-user-data');
+const userPasswordForm = document.querySelector('.form-user-password');
 
 // Делегирование событий
 if (mapBox) {
@@ -14312,7 +14338,37 @@ if (loginForm) {
 if (logOutBtn) {
   logOutBtn.addEventListener('click', logOut);
 }
-},{"@babel/polyfill":"../../node_modules/@babel/polyfill/lib/index.js","./login":"login.js","./mapbox":"mapbox.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+if (userDataForm) {
+  userDataForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    console.log(name, email);
+    updateSettings({
+      name,
+      email
+    }, 'data');
+  });
+}
+if (userPasswordForm) {
+  userPasswordForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    document.querySelector('.btn--save-password').textContent = 'Updating...';
+    const passwordCurrent = document.getElementById('password-current').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    await updateSettings({
+      passwordCurrent,
+      password,
+      passwordConfirm
+    }, 'password');
+    document.querySelector('.btn--save-password').textContent = 'Save password';
+    document.getElementById('password-current').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('password-confirm').value = '';
+  });
+}
+},{"@babel/polyfill":"../../node_modules/@babel/polyfill/lib/index.js","./login":"login.js","./mapbox":"mapbox.js","./updateSettings":"updateSettings.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -14337,7 +14393,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56562" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50502" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
