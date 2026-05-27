@@ -13,17 +13,19 @@ module.exports = class Email {
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
       return nodemailer.createTransport({
-        host: process.env.BREVO_HOST,
-        port: process.env.BREVO_PORT,
+        host: process.env.EMAIL_HOST_PROD,
+        port: Number(process.env.EMAIL_PORT_PROD),
+        secure: true,
         auth: {
-          user: process.env.BREVO_USERNAME,
-          pass: process.env.BREVO_PASSWORD,
+          user: process.env.EMAIL_USERNAME_PROD,
+          pass: process.env.EMAIL_PASSWORD_PROD,
         },
       });
     }
+
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
+      port: Number(process.env.EMAIL_PORT),
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
