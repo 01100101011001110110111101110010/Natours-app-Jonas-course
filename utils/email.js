@@ -12,8 +12,14 @@ module.exports = class Email {
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      // Sendgrid
-      return 1;
+      return nodemailer.createTransport({
+        host: process.env.BREVO_HOST,
+        port: process.env.BREVO_PORT,
+        auth: {
+          user: process.env.BREVO_USERNAME,
+          pass: process.env.BREVO_PASSWORD,
+        },
+      });
     }
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -38,7 +44,7 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: htmlToText.fromString(html),
+      text: htmlToText.convert(html),
     };
     // 3)Отправить электронное письмо
     await this.newTransport().sendMail(mailOptions);
@@ -46,5 +52,12 @@ module.exports = class Email {
 
   async sendWelcome() {
     await this.send('welcome', 'Welcome to the Natours family!');
+  }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your password reset token (valid for 10 min)',
+    );
   }
 };
