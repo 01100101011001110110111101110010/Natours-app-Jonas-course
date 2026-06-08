@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 const dotenv = require('dotenv');
-const Tour = require('./../../models/tourModels');
-const User = require('./../../models/userModels');
-const Review = require('./../../models/reviewModel');
+const Tour = require('../../models/tourModels');
+const User = require('../../models/userModels');
+const Review = require('../../models/reviewModel');
 
 dotenv.config({ path: './config.env' });
 
