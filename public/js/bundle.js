@@ -14306,6 +14306,19 @@ const updateSettings = async (data, type) => {
   }
 };
 module.exports = updateSettings;
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"stripe.js":[function(require,module,exports) {
+/* eslint-disable */
+const axios = require('axios').default;
+const _require = require('./alerts'),
+  showAlert = _require.showAlert;
+exports.checkoutSession = async tourId => {
+  try {
+    const session = await axios("/api/v1/bookings/checkout-session/".concat(tourId));
+    window.location.assign(session.data.session.url);
+  } catch (err) {
+    showAlert('error', err);
+  }
+};
 },{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"index.js":[function(require,module,exports) {
 /* eslint-disable */
 const babel = require('@babel/polyfill');
@@ -14314,6 +14327,8 @@ const _require = require('./login'),
   logOut = _require.logOut;
 const displayMap = require('./mapbox');
 const updateSettings = require('./updateSettings');
+const _require2 = require('./stripe'),
+  checkoutSession = _require2.checkoutSession;
 
 //DOM элементы
 const mapBox = document.getElementById('map');
@@ -14321,6 +14336,7 @@ const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
+const bookBtn = document.getElementById('book-tour');
 
 // Делегирование событий
 if (mapBox) {
@@ -14367,7 +14383,14 @@ if (userPasswordForm) {
     document.getElementById('password-confirm').value = '';
   });
 }
-},{"@babel/polyfill":"../../node_modules/@babel/polyfill/lib/index.js","./login":"login.js","./mapbox":"mapbox.js","./updateSettings":"updateSettings.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+if (bookBtn) {
+  bookBtn.addEventListener('click', e => {
+    e.target.textContent = 'Processing...';
+    const tourId = e.target.dataset.tourId;
+    checkoutSession(tourId);
+  });
+}
+},{"@babel/polyfill":"../../node_modules/@babel/polyfill/lib/index.js","./login":"login.js","./mapbox":"mapbox.js","./updateSettings":"updateSettings.js","./stripe":"stripe.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -14392,7 +14415,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54409" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51497" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

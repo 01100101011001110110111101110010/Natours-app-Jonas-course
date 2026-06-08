@@ -1,6 +1,13 @@
 /* eslint-disable */
-const stripe = Stripe(
-  'pk_test_51TbdBhPgSZUvzrFcnLbOGLJY291EFv33ZW8fNqbln8bUunDEQt1Bo2BfUbQNLuMHkzQLyG0TZ5frbGFMXgiJtOWk00IzQlQZ5y',
-);
+const axios = require('axios').default;
+const { showAlert } = require('./alerts');
 
-// 06:25 видео 210
+exports.checkoutSession = async (tourId) => {
+  try {
+    const session = await axios(`/api/v1/bookings/checkout-session/${tourId}`);
+
+    window.location.assign(session.data.session.url);
+  } catch (err) {
+    showAlert('error', err);
+  }
+};
