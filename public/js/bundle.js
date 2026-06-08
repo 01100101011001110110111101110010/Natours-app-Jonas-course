@@ -14231,6 +14231,36 @@ module.exports = {
   login,
   logOut
 };
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"signup.js":[function(require,module,exports) {
+/* eslint-disable */
+const axios = require('axios').default;
+const _require = require('./alerts'),
+  showAlert = _require.showAlert;
+const signup = async (name, email, password, passwordConfirm) => {
+  try {
+    const res = await axios({
+      method: 'POST',
+      url: '/api/v1/users/signup',
+      data: {
+        name,
+        email,
+        password,
+        passwordConfirm
+      }
+    });
+    if (res.data.status === 'success') {
+      showAlert('success', 'Account created successfully!');
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 1500);
+    }
+  } catch (err) {
+    showAlert('error', err.response.data.message);
+  }
+};
+module.exports = {
+  signup
+};
 },{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"mapbox.js":[function(require,module,exports) {
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -14325,14 +14355,17 @@ const babel = require('@babel/polyfill');
 const _require = require('./login'),
   login = _require.login,
   logOut = _require.logOut;
+const _require2 = require('./signup'),
+  signup = _require2.signup;
 const displayMap = require('./mapbox');
 const updateSettings = require('./updateSettings');
-const _require2 = require('./stripe'),
-  checkoutSession = _require2.checkoutSession;
+const _require3 = require('./stripe'),
+  checkoutSession = _require3.checkoutSession;
 
 //DOM элементы
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
+const signupForm = document.querySelector('.form--signup');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
@@ -14349,6 +14382,16 @@ if (loginForm) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     login(email, password);
+  });
+}
+if (signupForm) {
+  signupForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password-confirm').value;
+    signup(name, email, password, passwordConfirm);
   });
 }
 if (logOutBtn) {
@@ -14390,7 +14433,7 @@ if (bookBtn) {
     checkoutSession(tourId);
   });
 }
-},{"@babel/polyfill":"../../node_modules/@babel/polyfill/lib/index.js","./login":"login.js","./mapbox":"mapbox.js","./updateSettings":"updateSettings.js","./stripe":"stripe.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"@babel/polyfill":"../../node_modules/@babel/polyfill/lib/index.js","./login":"login.js","./signup":"signup.js","./mapbox":"mapbox.js","./updateSettings":"updateSettings.js","./stripe":"stripe.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -14415,7 +14458,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51497" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55447" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
