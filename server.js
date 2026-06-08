@@ -2,7 +2,11 @@ const dns = require('dns');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-dns.setServers(['1.1.1.1', '8.8.8.8']);
+dotenv.config({ path: './config.env' });
+
+if (process.env.NODE_ENV !== 'production') {
+  dns.setServers(['1.1.1.1', '8.8.8.8']);
+}
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -11,7 +15,6 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-dotenv.config({ path: './config.env' });
 const app = require('./app');
 
 const DB = process.env.DATABASE.replace(
