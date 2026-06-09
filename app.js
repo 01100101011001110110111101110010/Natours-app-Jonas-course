@@ -17,6 +17,7 @@ const userRouter = require('./routes/userRouts');
 const reviewRouter = require('./routes/reviewRouts');
 const bookingRouter = require('./routes/bookingRouts');
 const viewRouter = require('./routes/viewRouts');
+const bookingController = require('./controllers/bookingController');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -43,6 +44,14 @@ const limiter = rateLimit({
 });
 // Лимит запросов от 1го IP
 app.use('/api', limiter);
+
+// Stripe webhook — raw body нужен ДО express.json() для проверки подписи
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout,
+);
+
 //Парсер тела(body) запроса, чтение данных из body в req.body
 app.use(
   express.json({
