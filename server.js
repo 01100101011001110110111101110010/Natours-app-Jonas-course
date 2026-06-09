@@ -4,9 +4,7 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
 
-if (process.env.NODE_ENV !== 'production') {
-  dns.setServers(['1.1.1.1', '8.8.8.8']);
-}
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
