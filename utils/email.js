@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const pug = require('pug');
 const { convert } = require('html-to-text');
 
@@ -11,18 +12,6 @@ module.exports = class Email {
   }
 
   newTransport() {
-    if (process.env.NODE_ENV === 'production') {
-      return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST_PROD,
-        port: Number(process.env.EMAIL_PORT_PROD),
-        secure: true,
-        auth: {
-          user: process.env.EMAIL_USERNAME_PROD,
-          pass: process.env.EMAIL_PASSWORD_PROD,
-        },
-      });
-    }
-
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: Number(process.env.EMAIL_PORT),
@@ -34,22 +23,32 @@ module.exports = class Email {
   }
 
   async send(template, subject) {
-    // 1)Отрендерить HTML для электронного письма на основе шаблона
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       firstName: this.firstName,
       url: this.url,
       subject,
     });
-    // 2)Определить основные параметры электронной почты
-    const mailOptions = {
+    const text = convert(html);
+
+    if (process.env.NODE_ENV === 'production') {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: this.from,
+        to: this.to,
+        subject,
+        html,
+        text,
+      });
+      return;
+    }
+
+    await this.newTransport().sendMail({
       from: this.from,
       to: this.to,
       subject,
       html,
-      text: convert(html),
-    };
-    // 3)Отправить электронное письмо
-    await this.newTransport().sendMail(mailOptions);
+      text,
+    });
   }
 
   async sendWelcome() {
