@@ -22,8 +22,8 @@ router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
 router
   .route('/')
-  .get(authController.protect, tourController.getAllTours)
-  .post(tourController.createTour);
+  .get(tourController.getAllTours)
+  .post(authController.protect, tourController.createTour);
 router
   .route('/:id')
   .get(tourController.getTour)
