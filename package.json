@@ -4,7 +4,7 @@
   "description": "Learning-MongoDB-Express",
   "main": "server.js",
   "engines": {
-    "node": ">=22"
+    "node": "^22"
   },
   "scripts": {
     "start": "node server.js",
