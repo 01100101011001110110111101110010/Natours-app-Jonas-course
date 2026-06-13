@@ -5,6 +5,7 @@ const { signup } = require('./signup');
 const displayMap = require('./mapbox');
 const updateSettings = require('./updateSettings');
 const { checkoutSession } = require('./stripe');
+const { showAlert } = require('./alerts');
 
 //DOM элементы
 const mapBox = document.getElementById('map');
@@ -82,3 +83,6 @@ if (bookBtn) {
     checkoutSession(tourId);
   });
 }
+
+const alertMessage = document.querySelector('body').dataset.alert;
+if (alertMessage) showAlert('success', alertMessage, 20);

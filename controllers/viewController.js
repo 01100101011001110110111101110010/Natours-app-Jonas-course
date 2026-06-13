@@ -4,6 +4,13 @@ const AppError = require('../utils/appError');
 const User = require('../models/userModels');
 const Booking = require('../models/bookingModel');
 
+exports.alerts = (req, res, next) => {
+  const { alert } = req.query;
+  if (alert === 'booking')
+    res.locals.alert =
+      "Your booking was successful ✅ Please check your mail for a confirmation ✉️. If your booking doesn't show up here immediatly, please come back later";
+};
+
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1)Получить все данные о турах из нашей коллекции
   const tours = await Tour.find();
