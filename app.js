@@ -28,7 +28,7 @@ app.set('views', path.join(__dirname, 'views'));
 // 1)Глобальное Промежуточное ПО
 app.use(cors());
 
-app.options('*', cors());
+app.options('{*splat}', cors());
 // app.options('/api/v1/tours/:id', cors());
 
 // Обслуживание статических файлов
