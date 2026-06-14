@@ -1459,13 +1459,21 @@ body {
   }
 
   /* Hero страницы тура */
+  .section-header {
+    height: 70vw;
+  }
   .heading-primary {
-    font-size: 3.5rem;
+    font-size: 2.6rem;
     width: 90%;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+  }
+  .heading-primary span {
+    padding: 0.6rem 1rem;
   }
   .heading-box {
-    top: 40%;
+    top: 35%;
+    width: 90%;
   }
   .heading-box__group {
     flex-direction: column;

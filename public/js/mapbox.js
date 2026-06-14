@@ -15,6 +15,15 @@ const displayMap = (locations) => {
     scrollZoom: false,
   });
 
+  map.addControl(
+    new mapboxgl.NavigationControl({
+      showCompass: true,
+      showZoom: true,
+      visualizePitch: true,
+    }),
+    'top-right',
+  );
+
   map.on('load', () => {
     HTMLElement.prototype.focus = originalFocus;
   });
@@ -52,6 +61,7 @@ const displayMap = (locations) => {
       left: 100,
       right: 100,
     },
+    animate: false,
   });
 };
 
