@@ -46,6 +46,24 @@ if (logOutBtn) {
   logOutBtn.addEventListener('click', logOut);
 }
 if (userDataForm) {
+  const photoInput = document.getElementById('photo');
+  const photoPreview = userDataForm.querySelector('.form__user-photo');
+  const navUserPhoto = document.querySelector('.nav__user-img');
+  let previewUrl;
+
+  if (photoInput && photoPreview) {
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files[0];
+      if (!file) return;
+
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = URL.createObjectURL(file);
+
+      photoPreview.src = previewUrl;
+      if (navUserPhoto) navUserPhoto.src = previewUrl;
+    });
+  }
+
   userDataForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const form = new FormData();
